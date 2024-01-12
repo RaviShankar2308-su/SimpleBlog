@@ -9,7 +9,7 @@ class PostsController < ApplicationController
 
   def index
     posts = current_user.posts
-    render json: posts
+    render json: posts, status: :ok
   end
 
   def create
@@ -17,23 +17,19 @@ class PostsController < ApplicationController
     post.user = current_user
 
     if post.save
-      render json: { post: post, status: :created }
+      render json: { post: post }, status: :created
     else
       render :json, { message: post.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  private 
+  private
 
   def post_params
     params.require(:post).permit(:title, :content)
   end
 
   def check_login
-    render json: { error: 'You need to login' }, status: :unauthorized unless session[:user_id]
-  end
-
-  def current_user
-    User.find_by(id: session[:user_id])
+    render json: { error: 'You need to login' }, status: :unauthorized unless current_user
   end
 end
